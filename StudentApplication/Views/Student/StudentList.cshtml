@@ -1,0 +1,47 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+@model List<StudentApplication.Models.Student>
+
+<h2>Student List</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Remarks</th>
+            <th>Subscribed</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in Model)
+        {
+            <tr>
+                <td>@student.Name</td>
+                <td>@student.EmailId</td>
+                <td>@student.Remarks</td>
+                <td>
+                    @if (student.Subscribed)
+                    {
+                        <span class="text-success">Yes</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">No</span>
+                    }
+                </td>
+                <td>
+                    <a asp-controller="Student" asp-action="EditStudent" asp-route-id="@student.Id"
+                       class="btn btn-sm btn-primary">
+                        Edit
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

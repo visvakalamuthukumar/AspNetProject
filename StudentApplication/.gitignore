@@ -1,0 +1,14 @@
+﻿# Visual Studio
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.tmp
+*.log
+
+# Rider
+.idea/
+
+# Others
+*.DS_Store
