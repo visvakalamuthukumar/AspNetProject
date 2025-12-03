@@ -1,0 +1,60 @@
+﻿trigger:
+- main  # Or whatever your branch is
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+# 1. Install .NET SDK
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.0.x'  # Change if you're using .NET 6 or 7
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
+# 2. Restore NuGet Packages
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
+
+# 3. Build the Project
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+# 4. Run Unit Tests (if any)
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '**/*Tests.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+  continueOnError: true
+
+# 5. Publish the app
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: true
+
+# 6. Publish Build Artifact
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+# 7. Deploy to Azure App Service (CD)
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: '<Your-Azure-Service-Connection-Name>'
+    appType: 'webApp'
+    appName: '<Your-App-Service-Name>'
+    package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
